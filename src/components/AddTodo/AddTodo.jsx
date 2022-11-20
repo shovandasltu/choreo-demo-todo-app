@@ -4,6 +4,7 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
+import { createTodo } from "../../apis/todos";
 
 function AddTodo(props) {
   const [inputTitle, setInputTitle] = useState("");
@@ -15,11 +16,7 @@ function AddTodo(props) {
       description: inputDescription,
     };
 
-    fetch("http://ubuntu-vm:8090/todos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newTodo),
-    })
+    createTodo(newTodo)
       .then((res) => {
         if (res.status === 200) {
           setInputTitle("");

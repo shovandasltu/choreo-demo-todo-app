@@ -4,6 +4,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import { updateTodo } from "../../apis/todos";
 function TodoListItem(props) {
   const [done, setDone] = useState(props.done);
 
@@ -15,11 +16,7 @@ function TodoListItem(props) {
       description: props.description,
       done: doneState,
     };
-    fetch("http://ubuntu-vm:8090/todos", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTodo),
-    })
+    updateTodo(updatedTodo)
       .then((res) => {
         if (res.status === 200) {
           setDone(doneState);
@@ -36,7 +33,11 @@ function TodoListItem(props) {
     <Box>
       <ListItem>
         <Checkbox checked={done} onChange={handleDone} />
-        <ListItemText primary={props.title} secondary={props.description} />
+        <ListItemText
+          primary={props.title}
+          secondary={props.description}
+          sx={{ textDecoration: done ? "line-through" : "none" }}
+        />
       </ListItem>
       {props.divider ? <Divider /> : null}
     </Box>

@@ -1,13 +1,16 @@
 // import logo from './logo.svg';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./App.css";
 import Stack from "@mui/material/Stack";
 import AddTodo from "./components/AddTodo/AddTodo";
 import TodoList from "./components/TodoList/TodoList";
+import TodoFilter from "./components/TodoFilter/TodoFilter";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+import { getTodos } from "./apis/todos";
 
 const theme = createTheme({
   palette: {
@@ -19,21 +22,25 @@ const theme = createTheme({
 
 function App() {
   const [todoItems, setTodoItems] = useState([]);
+  const [showCompleted, setShowCompleted] = useState(true);
 
-  useEffect(() => {
-    fetchTodoItems();
-  }, []);
-
-  const fetchTodoItems = () => {
-    fetch("http://ubuntu-vm:8090/todos")
+  const fetchTodoItems = useCallback(() => {
+    getTodos(showCompleted)
       .then((resp) => resp.json())
       .then((result) => setTodoItems(result))
       .catch((err) => console.log(err));
-  };
+  }, [showCompleted]);
+
+  useEffect(() => {
+    fetchTodoItems();
+  }, [showCompleted, fetchTodoItems]);
 
   const addSuccessHandler = () => {
-    console.log("sda");
     fetchTodoItems();
+  };
+
+  const showCompletedHandler = (event) => {
+    setShowCompleted(event.target.checked);
   };
 
   return (
@@ -59,6 +66,10 @@ function App() {
             Todo List
           </Typography>
           <AddTodo onAddSuccess={addSuccessHandler} />
+          <TodoFilter
+            showCompleted={showCompleted}
+            onShowCompletedChange={showCompletedHandler}
+          />
           <TodoList todoItems={todoItems} />
         </Stack>
       </Container>
