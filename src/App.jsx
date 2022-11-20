@@ -1,16 +1,13 @@
 // import logo from './logo.svg';
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { useAuthContext } from "@asgardeo/auth-react";
 import "./App.css";
-import Stack from "@mui/material/Stack";
-import AddTodo from "./components/AddTodo/AddTodo";
-import TodoList from "./components/TodoList/TodoList";
-import TodoFilter from "./components/TodoFilter/TodoFilter";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-import { getTodos } from "./apis/todos";
+import TodoListPage from "./pages/TodoListPage";
+import LoginPage from "./pages/LoginPage";
 
 const theme = createTheme({
   palette: {
@@ -21,27 +18,37 @@ const theme = createTheme({
 });
 
 function App() {
-  const [todoItems, setTodoItems] = useState([]);
-  const [showCompleted, setShowCompleted] = useState(true);
-
-  const fetchTodoItems = useCallback(() => {
-    getTodos(showCompleted)
-      .then((resp) => resp.json())
-      .then((result) => setTodoItems(result))
-      .catch((err) => console.log(err));
-  }, [showCompleted]);
+  const { state, on, requestCustomGrant } = useAuthContext();
+  const [isTokenExchangeSuccess, setIsTokenExchangeSuccess] = useState(false);
 
   useEffect(() => {
-    fetchTodoItems();
-  }, [showCompleted, fetchTodoItems]);
-
-  const addSuccessHandler = () => {
-    fetchTodoItems();
-  };
-
-  const showCompletedHandler = (event) => {
-    setShowCompleted(event.target.checked);
-  };
+    on("sign-in", () => {
+      const config = {
+        attachToken: false,
+        tokenEndpoint: "https://sts.choreo.dev:443/oauth2/token",
+        data: {
+          client_id: "KvZFDZOL8MOZXDucNyImkmeefiMa",
+          grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+          subject_token_type: "urn:ietf:params:oauth:token-type:jwt",
+          requested_token_type: "urn:ietf:params:oauth:token-type:jwt",
+          scope: "{{scope}}",
+          subject_token: "{{token}}",
+        },
+        id: "apim-token-exchange",
+        returnResponse: true,
+        returnsSession: true,
+        signInRequired: true,
+      };
+      requestCustomGrant(config)
+        .then((response) => {
+          console.log(response);
+          setIsTokenExchangeSuccess(true);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    });
+  }, [on, requestCustomGrant]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -61,17 +68,13 @@ function App() {
       </header> */}
       <CssBaseline enableColorScheme />
       <Container>
-        <Stack spacing={2} sx={{ m: 1 }}>
-          <Typography variant="h4" align="center">
-            Todo List
-          </Typography>
-          <AddTodo onAddSuccess={addSuccessHandler} />
-          <TodoFilter
-            showCompleted={showCompleted}
-            onShowCompletedChange={showCompletedHandler}
+        {state.isAuthenticated && isTokenExchangeSuccess ? (
+          <TodoListPage />
+        ) : (
+          <LoginPage
+            isLoginProgress={state.isAuthenticated && !isTokenExchangeSuccess}
           />
-          <TodoList todoItems={todoItems} />
-        </Stack>
+        )}
       </Container>
     </ThemeProvider>
   );

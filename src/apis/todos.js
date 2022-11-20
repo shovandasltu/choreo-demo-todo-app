@@ -1,11 +1,22 @@
+import { AsgardeoSPAClient } from "@asgardeo/auth-react";
+
+const spaClient = AsgardeoSPAClient.getInstance();
+
 export const getTodos = (showCompleted) => {
+  // spaClient
+  //   .getAccessToken()
+  //   .then((token) => {
+  //     console.log(token);
+  //   })
+  //   .catch((error) => {
+  //     console.error(error);
+  //   });
+
   let url = `${process.env.REACT_APP_API_URL}/todos`;
   if (!showCompleted) {
     url += "?done=false";
   }
-  return fetch(url, {
-    headers: { "API-Key": `${process.env.REACT_APP_API_KEY}` },
-  });
+  return wrappedFetch(url);
 };
 
 export const createTodo = (newTodo) => {
@@ -27,4 +38,20 @@ export const updateTodo = (updatedTodo) => {
     },
     body: JSON.stringify(updatedTodo),
   });
+};
+
+const wrappedFetch = (input, init) => {
+  return spaClient
+    .getAccessToken()
+    .then((token) => {
+      const initSend = init || {};
+      initSend.headers = {
+        ...(init && init.headers),
+        Authorization: `Bearer ${token}`,
+      };
+      return fetch(input, initSend);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
