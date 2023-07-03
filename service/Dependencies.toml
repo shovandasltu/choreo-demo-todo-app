@@ -111,6 +111,9 @@ dependencies = [
 	{org = "ballerina", name = "time"},
 	{org = "ballerina", name = "url"}
 ]
+modules = [
+	{org = "ballerina", packageName = "http", moduleName = "http"}
+]
 
 [[package]]
 org = "ballerina"
@@ -138,6 +141,9 @@ dependencies = [
 	{org = "ballerina", name = "lang.string"},
 	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "time"}
+]
+modules = [
+	{org = "ballerina", packageName = "jwt", moduleName = "jwt"}
 ]
 
 [[package]]
@@ -213,6 +219,9 @@ version = "0.0.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
+modules = [
+	{org = "ballerina", packageName = "lang.value", moduleName = "lang.value"}
+]
 
 [[package]]
 org = "ballerina"
@@ -223,6 +232,9 @@ dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.value"},
 	{org = "ballerina", name = "observe"}
+]
+modules = [
+	{org = "ballerina", packageName = "log", moduleName = "log"}
 ]
 
 [[package]]
@@ -328,6 +340,10 @@ name = "todo_service"
 version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "graphql"},
+	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "jwt"},
+	{org = "ballerina", name = "lang.value"},
+	{org = "ballerina", name = "log"},
 	{org = "ballerinai", name = "observe"}
 ]
 modules = [
