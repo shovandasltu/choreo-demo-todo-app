@@ -19,7 +19,12 @@ function AddTodo(props) {
       title: inputTitle,
       description: inputDescription,
     };
-    createTodoMutation.mutate(newTodo);
+    createTodoMutation.mutate(newTodo, {
+      onSuccess: () => {
+        setInputTitle("");
+        setInputDescription("");
+      },
+    });
   };
 
   const titleChangeHandler = (event) => {
