@@ -4,31 +4,22 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import { createTodo } from "../../apis/todos";
+import { createTodo, useCreateTodo } from "../../apis/todos";
 
 function AddTodo(props) {
   const [inputTitle, setInputTitle] = useState("");
   const [inputDescription, setInputDescription] = useState("");
+  const createTodoMutation = useCreateTodo();
   const submitHandler = (event) => {
     event.preventDefault();
+    if (inputTitle === "") {
+      return;
+    }
     const newTodo = {
       title: inputTitle,
       description: inputDescription,
     };
-
-    createTodo(newTodo)
-      .then((res) => {
-        if (res.status === 200) {
-          setInputTitle("");
-          setInputDescription("");
-          props.onAddSuccess();
-        } else {
-          console.log("Some error occured");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    createTodoMutation.mutate(newTodo);
   };
 
   const titleChangeHandler = (event) => {

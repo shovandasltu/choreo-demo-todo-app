@@ -4,10 +4,10 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
-import { updateTodo } from "../../apis/todos";
+import { updateTodo, useDoneTodo } from "../../apis/todos";
 function TodoListItem(props) {
   const [done, setDone] = useState(props.done);
-
+  const doneTodoMutation = useDoneTodo();
   const handleDone = (event) => {
     const doneState = event.target.checked;
     const updatedTodo = {
@@ -16,17 +16,11 @@ function TodoListItem(props) {
       description: props.description,
       done: doneState,
     };
-    updateTodo(updatedTodo)
-      .then((res) => {
-        if (res.status === 200) {
-          setDone(doneState);
-        } else {
-          console.log("Some error occured");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    doneTodoMutation.mutate(updatedTodo, {
+      onSuccess: () => {
+        setDone(doneState);
+      },
+    });
   };
 
   return (

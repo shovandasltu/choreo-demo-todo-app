@@ -1,11 +1,14 @@
-import React from "react";
 import { useAuthContext } from "@asgardeo/auth-react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Loader from "../components/Loader/Loader";
 
-function LoginPage(props) {
+interface LoginPageProps {
+  isLoginProgress: boolean;
+}
+
+function LoginPage(props: LoginPageProps) {
   const { signIn } = useAuthContext();
 
   return (
