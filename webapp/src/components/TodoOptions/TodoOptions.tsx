@@ -1,5 +1,5 @@
-import React from "react";
-import { useAuthContext } from "@asgardeo/auth-react";
+import { useEffect, useState } from "react";
+import { BasicUserInfo, useAuthContext } from "@asgardeo/auth-react";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Switch from "@mui/material/Switch";
@@ -7,7 +7,18 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 
 function TodoFilter(props) {
-  const { state, signOut } = useAuthContext();
+  const { state, signOut, getBasicUserInfo } = useAuthContext();
+  const [username, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    const getUser = async () => {
+      const userResponse = await getBasicUserInfo();
+      console.log("userResponse", userResponse);
+      setUserName(userResponse?.orgName);
+    };
+    getUser();
+  }, []);
+
   return (
     <Paper>
       <Stack
@@ -27,9 +38,9 @@ function TodoFilter(props) {
           />
         </Stack>
         <Stack direction="row" alignItems="center" spacing={1}>
-          {state.displayName ? (
+          {username ? (
             <Typography variant="subtitle1" align="center">
-              Logged in as: {state.displayName}
+              Logged in as: {username}
             </Typography>
           ) : null}
 

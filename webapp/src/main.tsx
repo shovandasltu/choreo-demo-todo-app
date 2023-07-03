@@ -22,6 +22,7 @@ import App from "./App.tsx";
 import "./index.css";
 
 const client = new QueryClient();
+
 const authConfig = {
   signInRedirectURL: window.config.auth.signInRedirectURL,
   signOutRedirectURL: window.config.auth.signOutRedirectURL,
