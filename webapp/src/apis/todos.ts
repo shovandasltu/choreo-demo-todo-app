@@ -87,19 +87,16 @@ export const useGetTodos = (showCompleted) => {
     const datatoken = await getDecodedIDToken();
     console.log("------------", token);
     console.log("xs------------", datatoken);
-    return fetch(
-      "https://ec149f4e-f145-4064-a8ab-e1fc8f0c563f-dev.e1-us-east-azure.choreoapis.dev/rgyo/todo-svc/graphql-todo-aa9/1.0.0/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          query: showCompleted ? ALL_TODOS_QUERY : REMAINING_TODOS_QUERY,
-        }),
-      }
-    )
+    return fetch(window.config.todoApiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: showCompleted ? ALL_TODOS_QUERY : REMAINING_TODOS_QUERY,
+      }),
+    })
       .then((response) => {
         if (response.status >= 400) {
           response.json().then((data) => console.log(data));
@@ -130,23 +127,20 @@ export const useCreateTodo = () => {
     async (newTodo) => {
       const token = await getAccessToken();
       console.log("++++++++++++++", token);
-      return fetch(
-        "https://ec149f4e-f145-4064-a8ab-e1fc8f0c563f-dev.e1-us-east-azure.choreoapis.dev/rgyo/todo-svc/graphql-todo-aa9/1.0.0/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+      return fetch(window.config.todoApiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          query: CREATE_TODO_MUTATION,
+          variables: {
+            title: newTodo.title,
+            description: newTodo.description,
           },
-          body: JSON.stringify({
-            query: CREATE_TODO_MUTATION,
-            variables: {
-              title: newTodo.title,
-              description: newTodo.description,
-            },
-          }),
-        }
-      )
+        }),
+      })
         .then((response) => {
           if (response.status >= 400) {
             response.json().then((data) => console.log(data));
@@ -184,23 +178,20 @@ export const useDoneTodo = () => {
     async (updatedTodo) => {
       const token = await getAccessToken();
       console.log("++++++++++++++", token);
-      return fetch(
-        "https://ec149f4e-f145-4064-a8ab-e1fc8f0c563f-dev.e1-us-east-azure.choreoapis.dev/rgyo/todo-svc/graphql-todo-aa9/1.0.0/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+      return fetch(window.config.todoApiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          query: DONE_TODO_MUTATION,
+          variables: {
+            id: updatedTodo.id,
+            done: updatedTodo.done,
           },
-          body: JSON.stringify({
-            query: DONE_TODO_MUTATION,
-            variables: {
-              id: updatedTodo.id,
-              done: updatedTodo.done,
-            },
-          }),
-        }
-      )
+        }),
+      })
         .then((response) => {
           if (response.status >= 400) {
             response.json().then((data) => console.log(data));
