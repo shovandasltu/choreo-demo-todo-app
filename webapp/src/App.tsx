@@ -44,7 +44,7 @@ function App() {
         {state.isAuthenticated ? (
           <TodoListPage />
         ) : (
-          <LoginPage isLoginProgress={state.isAuthenticated} />
+          <LoginPage isLoginProgress={state.isLoading} />
         )}
       </Container>
     </ThemeProvider>
