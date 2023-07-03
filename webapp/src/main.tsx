@@ -23,10 +23,10 @@ import "./index.css";
 
 const client = new QueryClient();
 const authConfig = {
-  signInRedirectURL: "http://localhost:5173",
-  signOutRedirectURL: "http://localhost:5173",
-  clientID: "DXmO3q4E4IAJx9dZE5yyNATRjO4a",
-  baseUrl: "https://api.asgardeo.io/t/mirajabeysekara",
+  signInRedirectURL: window.config.auth.signInRedirectURL,
+  signOutRedirectURL: window.config.auth.signOutRedirectURL,
+  clientID: window.config.auth.clientID,
+  baseUrl: window.config.auth.baseUrl,
   scope: ["openid", "profile"],
 };
 
