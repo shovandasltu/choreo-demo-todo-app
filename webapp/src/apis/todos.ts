@@ -5,10 +5,11 @@ import { NewTodo, Todo } from "../types/types";
 const REMAINING_TODOS_QUERY = `
   {
     allTodos(done: false) {
-      title
       id
-      done
+      title
       description
+      done
+      userId
     }
   }
 `;
@@ -16,10 +17,11 @@ const REMAINING_TODOS_QUERY = `
 const ALL_TODOS_QUERY = `
   {
     allTodos {
-      title
       id
-      done
+      title
       description
+      done
+      userId
     }
   }
 `;
@@ -27,29 +29,7 @@ const ALL_TODOS_QUERY = `
 export const useGetTodos = (showCompleted: boolean) => {
   const { getAccessToken, refreshAccessToken } = useAuthContext();
   return useQuery(["get-todos", showCompleted], async () => {
-    const token = await getAccessToken();
-    return fetch(window.config.todoApiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        query: showCompleted ? ALL_TODOS_QUERY : REMAINING_TODOS_QUERY,
-      }),
-    })
-      .then((response) => {
-        if (response.status >= 400) {
-          if (response.status === 401) {
-            refreshAccessToken();
-          }
-          response.json().then((data) => console.log(data));
-          throw new Error("Error fetching data");
-        } else {
-          return response.json();
-        }
-      })
-      .then((data) => data.data);
+    return fetchGraphQL(showCompleted ? ALL_TODOS_QUERY : REMAINING_TODOS_QUERY, {}, getAccessToken, refreshAccessToken);
   });
 };
 
@@ -58,45 +38,22 @@ const CREATE_TODO_MUTATION = `
     createTodo(todoInput: {title: $title, description: $description}) {
       id
       title
-      done
       description
+      done
+      userId
     }
   }
 `;
 
 export const useCreateTodo = () => {
-  const { getAccessToken } = useAuthContext();
+  const { getAccessToken, refreshAccessToken } = useAuthContext();
   const queryClient = useQueryClient();
   return useMutation(
     async (newTodo: NewTodo) => {
-      const token = await getAccessToken();
-      return fetch(window.config.todoApiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          query: CREATE_TODO_MUTATION,
-          variables: {
-            title: newTodo.title,
-            description: newTodo.description,
-          },
-        }),
-      })
-        .then((response) => {
-          if (response.status >= 400) {
-            response.json().then((data) => console.log(data));
-            throw new Error("Error fetching data");
-          } else {
-            return response.json();
-          }
-        })
-        .then((data) => data.data);
+      return fetchGraphQL(CREATE_TODO_MUTATION, newTodo, getAccessToken, refreshAccessToken);
     },
     {
       onSuccess: () => {
-        console.log("success");
         queryClient.invalidateQueries("get-todos");
       },
     }
@@ -106,47 +63,24 @@ export const useCreateTodo = () => {
 const DONE_TODO_MUTATION = `
   mutation ($id: Int!, $done: Boolean!){
     setDone(done: $done, id: $id) {
-      description
-      done
       id
       title
+      description
+      done
+      userId
     }
   }
 `;
 
 export const useDoneTodo = () => {
-  const { getAccessToken } = useAuthContext();
+  const { getAccessToken, refreshAccessToken } = useAuthContext();
   const queryClient = useQueryClient();
   return useMutation(
     async (updatedTodo: Todo) => {
-      const token = await getAccessToken();
-      return fetch(window.config.todoApiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          query: DONE_TODO_MUTATION,
-          variables: {
-            id: updatedTodo.id,
-            done: updatedTodo.done,
-          },
-        }),
-      })
-        .then((response) => {
-          if (response.status >= 400) {
-            response.json().then((data) => console.log(data));
-            throw new Error("Error fetching data");
-          } else {
-            return response.json();
-          }
-        })
-        .then((data) => data.data);
+      return fetchGraphQL(DONE_TODO_MUTATION, updatedTodo, getAccessToken, refreshAccessToken);
     },
     {
       onSuccess: () => {
-        console.log("success");
         queryClient.invalidateQueries("get-todos");
       },
     }
@@ -154,27 +88,28 @@ export const useDoneTodo = () => {
 };
 
 
-// const fetchGraphQL = async (query: string, variables: any, getAccessToken: () => Promise<string>, refreshAccessToken: () => Promise<BasicUserInfo>) => {
-//   const token = await getAccessToken();
-//   return fetch(window.config.todoApiUrl, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${token}`,
-//     },
-//     body: JSON.stringify({
-//       query,
-//       variables,
-//     }),
-//   }).then((response) => {
-//     if (response.status >= 400) {
-//       if (response.status === 401) {
-//         refreshAccessToken();
-//       }
-//       response.json().then((data) => console.log(data));
-//       throw new Error("Error fetching data");
-//     } else {
-//       return response.json();
-//     }
-//   }).then((data) => data.data);
-// }
+const fetchGraphQL = async (query: string, variables: any, getAccessToken: () => Promise<string>, refreshAccessToken: () => Promise<BasicUserInfo>) => {
+  const token = await getAccessToken();
+  return fetch(window.config.todoApiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+  }).then((response) => {
+    if (response.status >= 400) {
+      if (response.status === 401) {
+        refreshAccessToken();
+      }
+      return response.json().then((data) => {
+        throw new Error(`Error fetching data from graphql: ${JSON.stringify(data)}`);
+      });
+    } else {
+      return response.json();
+    }
+  }).then((data) => data.data);
+}

@@ -18,7 +18,6 @@ function TodoFilter(props: TodoFilterProps) {
   useEffect(() => {
     const getUser = async () => {
       const userResponse = await getBasicUserInfo();
-      console.log("userResponse", userResponse);
       setUserName(userResponse?.orgName);
     };
     getUser();
