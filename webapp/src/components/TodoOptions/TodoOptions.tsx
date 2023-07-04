@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
-import { BasicUserInfo, useAuthContext } from "@asgardeo/auth-react";
+import { useAuthContext } from "@asgardeo/auth-react";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Switch from "@mui/material/Switch";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 
-function TodoFilter(props) {
-  const { state, signOut, getBasicUserInfo } = useAuthContext();
+interface TodoFilterProps {
+  showCompleted: boolean;
+  onShowCompletedChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function TodoFilter(props: TodoFilterProps) {
+  const { signOut, getBasicUserInfo } = useAuthContext();
   const [username, setUserName] = useState<string>("");
 
   useEffect(() => {

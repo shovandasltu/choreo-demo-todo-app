@@ -1,9 +1,13 @@
-import React from "react";
 import TodoListItem from "./TodoListItem";
 import List from "@mui/material/List";
 import Paper from "@mui/material/Paper";
+import { Todo } from "../../types/types";
 
-function TodoList(props) {
+interface TodoListProps {
+  todoItems: Todo[];
+}
+
+function TodoList(props: TodoListProps) {
   return (
     <Paper>
       <List sx={{ bgcolor: "background.paper" }}>

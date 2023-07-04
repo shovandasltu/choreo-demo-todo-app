@@ -12,7 +12,13 @@ The frontend SPA for the Todo List App.
 
 ### Run the locally development server
 
-Execute the command below to start the development server:
+1. Install the dependencies:
+
+```shell
+    npm install
+```
+
+2. Execute the following command to start the development server:
 
 ```shell
     npm run dev

@@ -4,13 +4,13 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import { createTodo, useCreateTodo } from "../../apis/todos";
+import { useCreateTodo } from "../../apis/todos";
 
-function AddTodo(props) {
+function AddTodo() {
   const [inputTitle, setInputTitle] = useState("");
   const [inputDescription, setInputDescription] = useState("");
   const createTodoMutation = useCreateTodo();
-  const submitHandler = (event) => {
+  const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (inputTitle === "") {
       return;
@@ -27,11 +27,11 @@ function AddTodo(props) {
     });
   };
 
-  const titleChangeHandler = (event) => {
+  const titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputTitle(event.target.value);
   };
 
-  const descriptionChangeHandler = (event) => {
+  const descriptionChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputDescription(event.target.value);
   };
 

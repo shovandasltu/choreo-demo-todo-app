@@ -1,8 +1,6 @@
-import { AsgardeoSPAClient } from "@asgardeo/auth-react";
-
-import { useAuthContext } from "@asgardeo/auth-react";
-
+import { BasicUserInfo, useAuthContext } from "@asgardeo/auth-react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
+import { NewTodo, Todo } from "../types/types";
 
 const REMAINING_TODOS_QUERY = `
   {
@@ -26,8 +24,8 @@ const ALL_TODOS_QUERY = `
   }
 `;
 
-export const useGetTodos = (showCompleted) => {
-  const { getAccessToken } = useAuthContext();
+export const useGetTodos = (showCompleted: boolean) => {
+  const { getAccessToken, refreshAccessToken } = useAuthContext();
   return useQuery(["get-todos", showCompleted], async () => {
     const token = await getAccessToken();
     return fetch(window.config.todoApiUrl, {
@@ -42,6 +40,9 @@ export const useGetTodos = (showCompleted) => {
     })
       .then((response) => {
         if (response.status >= 400) {
+          if (response.status === 401) {
+            refreshAccessToken();
+          }
           response.json().then((data) => console.log(data));
           throw new Error("Error fetching data");
         } else {
@@ -67,7 +68,7 @@ export const useCreateTodo = () => {
   const { getAccessToken } = useAuthContext();
   const queryClient = useQueryClient();
   return useMutation(
-    async (newTodo) => {
+    async (newTodo: NewTodo) => {
       const token = await getAccessToken();
       return fetch(window.config.todoApiUrl, {
         method: "POST",
@@ -117,7 +118,7 @@ export const useDoneTodo = () => {
   const { getAccessToken } = useAuthContext();
   const queryClient = useQueryClient();
   return useMutation(
-    async (updatedTodo) => {
+    async (updatedTodo: Todo) => {
       const token = await getAccessToken();
       return fetch(window.config.todoApiUrl, {
         method: "POST",
@@ -151,3 +152,29 @@ export const useDoneTodo = () => {
     }
   );
 };
+
+
+// const fetchGraphQL = async (query: string, variables: any, getAccessToken: () => Promise<string>, refreshAccessToken: () => Promise<BasicUserInfo>) => {
+//   const token = await getAccessToken();
+//   return fetch(window.config.todoApiUrl, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${token}`,
+//     },
+//     body: JSON.stringify({
+//       query,
+//       variables,
+//     }),
+//   }).then((response) => {
+//     if (response.status >= 400) {
+//       if (response.status === 401) {
+//         refreshAccessToken();
+//       }
+//       response.json().then((data) => console.log(data));
+//       throw new Error("Error fetching data");
+//     } else {
+//       return response.json();
+//     }
+//   }).then((data) => data.data);
+// }
